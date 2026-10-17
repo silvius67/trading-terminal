@@ -1,0 +1,8 @@
+[package]
+name = "trading-terminal-example"
+version = "0.1.0"
+edition = "2021"
+description = "Drive Trading Terminal's local API from Rust (standard library only)"
+publish = false
+
+[dependencies]
