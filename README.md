@@ -6,7 +6,7 @@ It's one small Node.js app with no dependencies. Your watchlists, drawings, aler
 
 ## Install
 
-**With an AI coding agent (easiest).** Paste the setup prompt you were given into Claude Code. It checks your machine, installs this, tests it, opens it in your browser and sets up your watchlist. It takes a couple of minutes.
+**With an AI coding agent (easiest).** Paste the setup prompt from [prompt-instalare.md](prompt-instalare.md) (in Romanian) into Claude Code. It checks your machine, installs this, tests it, opens it in your browser and sets up your watchlist. It takes a couple of minutes.
 
 **By hand.**
 
