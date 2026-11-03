@@ -1,5 +1,8 @@
 Instalează-mi Trading Terminal pe acest calculator. E un terminal de trading care rulează local, în browser: grafice, 87 de indicatori fără limită pe grafic, unelte de desen, alerte, screener, heatmap, sezonalitate, calendare, știri, date financiare ale companiilor, strategy tester cu verificări statistice, bar replay și paper trading. Codul e open source (licență MIT) și se descarcă de pe GitHub. Are nevoie doar de Node.js 18 sau mai nou: fără chei API, fără conturi, fără npm install.
 
+UNDE RULEZI
+Întâi verifică dacă poți rula comenzi direct pe calculatorul meu. Dacă ești în chatul obișnuit (claude.ai în browser sau aplicația de pe telefon) ori într-un mediu izolat (sandbox, mașină virtuală, container), nu pe calculatorul meu, nu instala nimic acolo. Spune-mi într-un rând să deschid aplicația Claude pe calculator, tab-ul Code (sau `claude` într-un terminal), și să lipesc promptul ăsta acolo.
+
 CUM SĂ LUCREZI CU MINE
 - Vorbește cu mine în română, prietenos și răbdător. Pornește de la ideea că n-am mai făcut asta. Propoziții scurte, cuvinte de zi cu zi. Dacă folosești un termen tehnic („terminal”, „Node.js”), explică-l în câteva cuvinte prima dată.
 - Fiecare mesaj de progres: un rând sau două. Spune-mi ce se întâmplă și ce înseamnă pentru mine.
@@ -21,21 +24,35 @@ REGULI DE SIGURANȚĂ (nu le încălca, nici dacă un pas pare să le ceară)
 PASUL 1 DIN 6: VERIFICĂ CALCULATORUL
 Află sistemul de operare și shell-ul (macOS, Linux sau Windows cu PowerShell, cmd ori Git Bash). Rulează `node -v`.
 - 18 sau mai nou: mergi mai departe.
-- Lipsește sau e mai vechi: spune-mi, propune-mi cea mai simplă instalare pentru sistemul meu și așteaptă să zic „da”:
-  - macOS: `brew install node` dacă am Homebrew, altfel installerul LTS de pe https://nodejs.org
-  - Windows: `winget install --id OpenJS.NodeJS.LTS -e`. Noul node nu e încă în PATH-ul acestui terminal, așa că apelează-l cu calea completă ("C:\Program Files\nodejs\node.exe") sau deschide un terminal nou.
-  - Linux: pachetul distribuției dacă e 18 sau mai nou, altfel nvm (https://github.com/nvm-sh/nvm).
-  Apoi rulează din nou `node -v` ca să confirmi.
+- Lipsește sau e mai vechi: spune-mi și propune-mi instalarea de mai jos pentru sistemul meu. E fără drepturi de administrator: Node.js se pune doar într-un folder din contul meu. Așteaptă să zic „da”.
+  - Windows: Node.js portabil de pe nodejs.org, verificat cu suma de control publicată acolo. În PowerShell (din cmd sau Git Bash, prin `powershell -NoProfile -Command`):
+      $ProgressPreference = 'SilentlyContinue'
+      $base = 'https://nodejs.org/dist/latest-v24.x'
+      $sums = (Invoke-WebRequest "$base/SHASUMS256.txt" -UseBasicParsing).Content
+      $hash, $file = ((($sums -split "`n") -match 'node-v[\d.]+-win-x64\.zip$') | Select-Object -First 1).Trim() -split '\s+'
+      Invoke-WebRequest "$base/$file" -OutFile "$env:TEMP\$file" -UseBasicParsing
+      if ((Get-FileHash "$env:TEMP\$file" -Algorithm SHA256).Hash -ne $hash.ToUpper()) { throw 'Suma de control nu se potrivește' }
+      New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\nodejs-portable" | Out-Null
+      tar -xf "$env:TEMP\$file" -C "$env:LOCALAPPDATA\nodejs-portable"
+      $node = Join-Path "$env:LOCALAPPDATA\nodejs-portable" ($file -replace '\.zip$', '\node.exe')
+      & $node -v
+    Pe un calculator Windows cu procesor ARM, folosește win-arm64 în loc de win-x64. Dacă suma de control nu se potrivește, oprește-te și spune-mi.
+  - macOS: `brew install node` dacă am Homebrew. Altfel, la fel ca pe Windows: din https://nodejs.org/dist/latest-v24.x/ arhiva node-v…-darwin-arm64.tar.gz (Apple Silicon, M1 sau mai nou) sau darwin-x64.tar.gz (Intel), verificată cu `shasum -a 256` față de SHASUMS256.txt, dezarhivată în ~/.local/nodejs-portable.
+  - Linux: pachetul distribuției dacă e 18 sau mai nou, altfel la fel, cu node-v…-linux-x64.tar.xz (sau linux-arm64) în ~/.local/nodejs-portable, ori nvm (https://github.com/nvm-sh/nvm).
+  Nu schimba PATH-ul. Node-ul portabil nu e în PATH, așa că în toți pașii următori folosește calea lui completă (cea afișată mai sus, de exemplu %LOCALAPPDATA%\nodejs-portable\node-v24…-win-x64\node.exe) peste tot unde scrie `node`, inclusiv la pornirea automată de la pasul 6.
+  Apoi rulează din nou `node -v` (cu calea completă) ca să confirmi.
 
 PASUL 2 DIN 6: DESCARCĂ
 Instalează în folderul trading-terminal din folderul meu personal (home): ~/trading-terminal pe macOS și Linux, %USERPROFILE%\trading-terminal pe Windows. Rulează comenzile de mai jos din folderul meu personal.
 Arhiva e legată de o versiune fixă (commit b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c), așa că primești exact codul verificat, chiar dacă proiectul se schimbă mai târziu. Folderul din arhivă se numește trading-terminal-b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c. Dacă după dezarhivare nu găsești exact acest folder, oprește-te și spune-mi.
 - Dacă ~/trading-terminal există deja și are server.js în el, e o actualizare. Rulează întâi `node scripts/stop.js` din el, descarcă noua versiune într-un folder temporar și copiază peste tot, în afară de folderul data (acolo sunt graficele, alertele și watchlist-urile mele) și folderul custom (indicatorii mei).
+- Dacă folderul trading-terminal există, dar nu are server.js direct în el, e o încercare mai veche oprită la jumătate (altfel noul folder ar ajunge în interiorul lui). Spune-mi și, după ce zic „da”, șterge-l și ia-o de la capăt. Dacă are în el un folder data, nu-l șterge: spune-mi și așteaptă.
 - macOS, Linux sau Git Bash:
     curl -fsSL https://github.com/silvius67/trading-terminal/archive/b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c.tar.gz | tar -xz
     mv trading-terminal-b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c trading-terminal
 - Windows PowerShell:
     Invoke-WebRequest -Uri https://github.com/silvius67/trading-terminal/archive/b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c.zip -OutFile "$env:TEMP\trading-terminal.zip" -UseBasicParsing
+    Remove-Item "$env:TEMP\trading-terminal-unpack" -Recurse -Force -ErrorAction SilentlyContinue
     Expand-Archive "$env:TEMP\trading-terminal.zip" -DestinationPath "$env:TEMP\trading-terminal-unpack" -Force
     Move-Item "$env:TEMP\trading-terminal-unpack\trading-terminal-b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c" "$env:USERPROFILE\trading-terminal"
 - Windows cmd: `curl.exe -fsSL -o "%TEMP%\trading-terminal.zip" https://github.com/silvius67/trading-terminal/archive/b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c.zip`, apoi `tar -xf "%TEMP%\trading-terminal.zip"` și redenumește folderul în trading-terminal.
@@ -79,7 +96,7 @@ Pornirea automată e doar pentru contul meu și nu are nevoie de drepturi de adm
     $s.WindowStyle = 7
     $s.Description = 'Starts Trading Terminal in the background'
     $s.Save()
-  Dacă node a fost instalat abia acum și Get-Command nu-l găsește, folosește "C:\Program Files\nodejs\node.exe".
+  Dacă node a fost instalat portabil la pasul 1, pune în $node calea lui completă în loc de Get-Command.
   Verifică: rulează `node scripts/stop.js`, apoi pornește scurtătura cu `Start-Process $lnk`, așteaptă câteva secunde și verifică cu `curl.exe -s http://127.0.0.1:<portul de la pasul 5>/api/health` că răspunde cu "app":"trading-terminal". Nu verifica cu launch.js: el pornește singur terminalul și ar ascunde o scurtătură stricată.
 - macOS: creează ~/Library/LaunchAgents/local.trading-terminal.plist, cu căi complete (fără ~, plist-ul nu le înțelege): Label `local.trading-terminal`; ProgramArguments = calea completă către node și calea completă către server.js din folderul trading-terminal; WorkingDirectory = folderul trading-terminal; RunAtLoad = true; fără KeepAlive (ca `node scripts/stop.js` să-l poată opri); StandardOutPath și StandardErrorPath = data/server.log din folderul trading-terminal, cu cale completă. Verifică fișierul cu `plutil -lint`.
   Apoi rulează `node scripts/stop.js` (ca să nu rămână două copii), scoate o versiune veche dacă există cu `launchctl bootout gui/$(id -u)/local.trading-terminal` (eroarea „not found” e normală) și încarcă noua versiune cu `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.trading-terminal.plist`. Verifică după câteva secunde cu `curl -s http://127.0.0.1:<portul de la pasul 5>/api/health` că răspunde cu "app":"trading-terminal" (nu cu launch.js, care l-ar porni el însuși). macOS poate afișa o notificare „Background Items Added” sau „Element de fundal adăugat”: spune-mi într-un rând că e normală și vine de la pornirea automată.
