@@ -44,18 +44,18 @@ Află sistemul de operare și shell-ul (macOS, Linux sau Windows cu PowerShell, 
 
 PASUL 2 DIN 6: DESCARCĂ
 Instalează în folderul trading-terminal din folderul meu personal (home): ~/trading-terminal pe macOS și Linux, %USERPROFILE%\trading-terminal pe Windows. Rulează comenzile de mai jos din folderul meu personal.
-Arhiva e legată de o versiune fixă (commit b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c), așa că primești exact codul verificat, chiar dacă proiectul se schimbă mai târziu. Folderul din arhivă se numește trading-terminal-b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c. Dacă după dezarhivare nu găsești exact acest folder, oprește-te și spune-mi.
+Arhiva e legată de o versiune fixă (commit de372a3f449ef61f9a2bb3c5258859e1b0586abb), așa că primești exact codul verificat, chiar dacă proiectul se schimbă mai târziu. Folderul din arhivă se numește trading-terminal-de372a3f449ef61f9a2bb3c5258859e1b0586abb. Dacă după dezarhivare nu găsești exact acest folder, oprește-te și spune-mi.
 - Dacă ~/trading-terminal există deja și are server.js în el, e o actualizare. Rulează întâi `node scripts/stop.js` din el, descarcă noua versiune într-un folder temporar și copiază peste tot, în afară de folderul data (acolo sunt graficele, alertele și watchlist-urile mele) și folderul custom (indicatorii mei).
 - Dacă folderul trading-terminal există, dar nu are server.js direct în el, e o încercare mai veche oprită la jumătate (altfel noul folder ar ajunge în interiorul lui). Spune-mi și, după ce zic „da”, șterge-l și ia-o de la capăt. Dacă are în el un folder data, nu-l șterge: spune-mi și așteaptă.
 - macOS, Linux sau Git Bash:
-    curl -fsSL https://github.com/silvius67/trading-terminal/archive/b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c.tar.gz | tar -xz
-    mv trading-terminal-b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c trading-terminal
+    curl -fsSL https://github.com/silvius67/trading-terminal/archive/de372a3f449ef61f9a2bb3c5258859e1b0586abb.tar.gz | tar -xz
+    mv trading-terminal-de372a3f449ef61f9a2bb3c5258859e1b0586abb trading-terminal
 - Windows PowerShell:
-    Invoke-WebRequest -Uri https://github.com/silvius67/trading-terminal/archive/b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c.zip -OutFile "$env:TEMP\trading-terminal.zip" -UseBasicParsing
+    Invoke-WebRequest -Uri https://github.com/silvius67/trading-terminal/archive/de372a3f449ef61f9a2bb3c5258859e1b0586abb.zip -OutFile "$env:TEMP\trading-terminal.zip" -UseBasicParsing
     Remove-Item "$env:TEMP\trading-terminal-unpack" -Recurse -Force -ErrorAction SilentlyContinue
     Expand-Archive "$env:TEMP\trading-terminal.zip" -DestinationPath "$env:TEMP\trading-terminal-unpack" -Force
-    Move-Item "$env:TEMP\trading-terminal-unpack\trading-terminal-b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c" "$env:USERPROFILE\trading-terminal"
-- Windows cmd: `curl.exe -fsSL -o "%TEMP%\trading-terminal.zip" https://github.com/silvius67/trading-terminal/archive/b68f534ee9a8d5fd5d14f8e2f88b95ef01c00e1c.zip`, apoi `tar -xf "%TEMP%\trading-terminal.zip"` și redenumește folderul în trading-terminal.
+    Move-Item "$env:TEMP\trading-terminal-unpack\trading-terminal-de372a3f449ef61f9a2bb3c5258859e1b0586abb" "$env:USERPROFILE\trading-terminal"
+- Windows cmd: `curl.exe -fsSL -o "%TEMP%\trading-terminal.zip" https://github.com/silvius67/trading-terminal/archive/de372a3f449ef61f9a2bb3c5258859e1b0586abb.zip`, apoi `tar -xf "%TEMP%\trading-terminal.zip"` și redenumește folderul în trading-terminal.
 - În Windows PowerShell 5, leagă comenzile cu ; nu cu &&, iar `curl` înseamnă Invoke-WebRequest (folosește curl.exe pentru curl adevărat).
 - Verifică apoi că folderul trading-terminal are server.js și package.json, și rulează toate comenzile de mai jos din interiorul lui.
 
