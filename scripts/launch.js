@@ -2,7 +2,7 @@
 // Start Trading Terminal in the background and open your browser. It keeps running after this
 // terminal closes. If it's already running, this just opens the browser.
 //   node scripts/launch.js            node scripts/launch.js --no-open
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,13 +28,31 @@ function openBrowser(url) {
   try { const c = spawn(cmd, args, { detached: true, stdio: 'ignore' }); c.on('error', () => {}); c.unref(); } catch { /* headless */ }
 }
 
+function startOutsideJob(log) {
+  const q = (x) => '"' + x + '"';
+  const env = process.env.PORT ? `set "PORT=${Number(process.env.PORT)}" && ` : '';
+  const cmd = `cmd.exe /d /c "${env}${q(process.execPath)} ${q(path.join(root, 'server.js'))} >> ${q(log)} 2>&1"`;
+  const ps = "$si = New-CimInstance -ClientOnly -CimClass (Get-CimClass Win32_ProcessStartup) -Property @{ShowWindow=[uint16]0}; " +
+    "$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine=$env:QT_CMD; CurrentDirectory=$env:QT_CWD; ProcessStartupInformation=$si}; " +
+    "exit [int]$r.ReturnValue";
+  try {
+    const r = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', ps], { env: { ...process.env, QT_CMD: cmd, QT_CWD: root }, windowsHide: true, timeout: 20000 });
+    return r.status === 0;
+  } catch { return false; }
+}
+
 let port = await running();
 if (!port) {
   fs.mkdirSync(path.join(root, 'data'), { recursive: true });
   const log = path.join(root, 'data', 'server.log');
   const fd = fs.openSync(log, 'a');
-  const child = spawn(process.execPath, [path.join(root, 'server.js')], { cwd: root, detached: true, stdio: ['ignore', fd, fd], windowsHide: true, env: process.env });
-  child.unref();
+  // On Windows, a process started from a terminal or an app (Claude, an IDE) sits in that app's
+  // "job" and is killed when the app closes or restarts, even with detached: true. Windows
+  // Management (WMI) starts the server outside any job, so it keeps running. Fallback: plain spawn.
+  if (!(process.platform === 'win32' && startOutsideJob(log))) {
+    const child = spawn(process.execPath, [path.join(root, 'server.js')], { cwd: root, detached: true, stdio: ['ignore', fd, fd], windowsHide: true, env: process.env });
+    child.unref();
+  }
   fs.closeSync(fd); // the server has its own copy
   for (let i = 0; i < 40 && !port; i++) { await new Promise((r) => setTimeout(r, 400)); port = await running(); }
   if (!port) {
